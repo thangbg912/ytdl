@@ -69,7 +69,8 @@ def read_description_file(description_file:str)->list:
         # chapter lines start with timecode
         line_counter = 1
         for line in f:
-            result = re.search(r"\(?(\d?[:]?\d+[:]\d+)\)?", line)
+            #result = re.search(r"\(?(\d?[:]?\d+[:]\d+)\)?", line)
+            result = re.search(r"\(?((0?[0-9])?[:]?\d+[:]\d+)\)?", line)
             try:
                 # result = re.search("\(?(\d+[:]\d+[:]\d+)\)?", line)
                 time_count = datetime.datetime.strptime(result.group(1), '%H:%M:%S')
@@ -123,6 +124,11 @@ def split_mp4(chapters:list, download_filename:str, download_name:str)->None:
             end_time = current_dur
         #output_name = f'{download_name} - ({current_chapter[2]}).mp4'
         output_name = f'{current_chapter[2]}.mp3'
+        output_name = output_name.replace(":", "")
+
+
+        print ("ffmpeg -i ", download_filename, "-acodec copy -ss ", start_time, " -to", end_time, output_name )
+
         #subprocess.run(["ffmpeg", "-ss", start_time, "-to", end_time,
         #                "-i", download_filename, "-acodec", "copy",
         #                "-vcodec", "copy", output_name])
@@ -176,7 +182,7 @@ if __name__ == '__main__':
         if args.split:
             split_mp4(chapters=chapters, download_filename=download_filename,
                       download_name=download_name)
-            #os.remove(download_filename)
+            os.remove(download_filename)
         
         #add_chapters_to_mp4(chapter_file_name=chapter_file,
         #                      name_for_download=download_filename)
